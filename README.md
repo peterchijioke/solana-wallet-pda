@@ -56,7 +56,7 @@ cargo build-bpf
 Deploy your program to the Solana devnet or mainnet using the Solana CLI:
 
 ```bash
-solana program deploy target/deploy/your_program.so
+solana program deploy target/deploy/solana-wallet-pda.so
 ```
 
 ### 2. Interact with the Program
