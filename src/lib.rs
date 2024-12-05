@@ -1,5 +1,6 @@
-mod create_account;
 mod deposit;
+mod pool_account;
+mod user_account;
 mod withdraw;
 use solana_program::entrypoint;
 use solana_program::entrypoint::ProgramResult;
@@ -14,9 +15,10 @@ pub fn process_instruction(
 ) -> ProgramResult {
     let (instruction, data) = Instruction::decode(instruction_data)?;
     match instruction {
-        Instruction::CreateAccount => create_account::process(program_id, accounts, data),
+        Instruction::CreateAccount => user_account::process(program_id, accounts, data),
         Instruction::Deposit(amount) => deposit::process(program_id, accounts, amount),
         Instruction::Withdraw(amount) => withdraw::process(program_id, accounts, amount),
+        Instruction::PoolAccount => pool_account::process(program_id, accounts, data),
     }
 }
 
@@ -25,6 +27,7 @@ pub enum Instruction {
     CreateAccount,
     Deposit(u64),
     Withdraw(u64),
+    PoolAccount,
 }
 
 impl Instruction {
@@ -51,6 +54,8 @@ impl Instruction {
                 );
                 Instruction::Withdraw(amount)
             }
+            3 => Instruction::PoolAccount,
+
             _ => return Err(ProgramError::InvalidInstructionData),
         };
 
