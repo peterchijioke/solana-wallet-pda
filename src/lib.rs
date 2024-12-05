@@ -1,6 +1,5 @@
 mod create_account;
 mod deposit;
-mod initialize;
 mod withdraw;
 use solana_program::entrypoint;
 use solana_program::entrypoint::ProgramResult;
@@ -15,7 +14,6 @@ pub fn process_instruction(
 ) -> ProgramResult {
     let (instruction, data) = Instruction::decode(instruction_data)?;
     match instruction {
-        Instruction::Initialize => initialize::process(program_id, accounts, data),
         Instruction::CreateAccount => create_account::process(program_id, accounts, data),
         Instruction::Deposit(amount) => deposit::process(program_id, accounts, amount),
         Instruction::Withdraw(amount) => withdraw::process(program_id, accounts, amount),
@@ -24,7 +22,6 @@ pub fn process_instruction(
 
 #[derive(Debug)]
 pub enum Instruction {
-    Initialize,
     CreateAccount,
     Deposit(u64),
     Withdraw(u64),
@@ -39,16 +36,15 @@ impl Instruction {
         let (instruction_byte, rest) = data.split_first().unwrap();
 
         let instruction = match instruction_byte {
-            0 => Instruction::Initialize,
-            1 => Instruction::CreateAccount,
-            2 => {
+            0 => Instruction::CreateAccount,
+            1 => {
                 let amount = u64::from_le_bytes(
                     rest.try_into()
                         .map_err(|_| ProgramError::InvalidInstructionData)?,
                 );
                 Instruction::Deposit(amount)
             }
-            3 => {
+            2 => {
                 let amount = u64::from_le_bytes(
                     rest.try_into()
                         .map_err(|_| ProgramError::InvalidInstructionData)?,
