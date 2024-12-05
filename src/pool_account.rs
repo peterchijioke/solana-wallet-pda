@@ -15,7 +15,7 @@ pub struct PoolWallet {
     pub total_balance: u64,
 }
 
-pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], _data: &[u8]) -> ProgramResult {
     msg!("Create Pool Wallet PDA instruction called");
 
     let account_info_iter = &mut accounts.iter();
