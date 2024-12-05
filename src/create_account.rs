@@ -1,5 +1,4 @@
-use bincode;
-use serde::{Deserialize, Serialize};
+use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
@@ -11,12 +10,12 @@ use solana_program::{
     system_instruction,
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct UserWallet {
     pub balance: u64,
 }
 
-pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], _data: &[u8]) -> ProgramResult {
     msg!("CreateAccount with PDA instruction called");
 
     let account_info_iter = &mut accounts.iter();
@@ -56,8 +55,8 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Pr
     // Initialize the balance of the user wallet to 0
     let user_wallet_data = UserWallet { balance: 0 };
 
-    // Serialize the struct into a Vec<u8>, handling errors explicitly
-    let user_wallet_data_serialized = bincode::serialize(&user_wallet_data).map_err(|e| {
+    // Serialize the struct into a Vec<u8>, handling errors explicitly using Borsh
+    let user_wallet_data_serialized = user_wallet_data.try_to_vec().map_err(|e| {
         msg!("Serialization error: {}", e);
         ProgramError::InvalidInstructionData // or another appropriate error
     })?;
